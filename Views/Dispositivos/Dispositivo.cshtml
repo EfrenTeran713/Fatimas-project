@@ -1,0 +1,364 @@
+﻿
+@{
+    ViewBag.Title = "Dispositivo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3 bg-primary">
+        <h6 class="lista" >Lista de Dispositivos</h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <button class="btn btn-success btn-sm" type="button" onclick="abrirModal(null)">Crear Nuevo</button>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-sm-12">
+
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="tabla" style="width:100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Nombre del dispositivo</th>
+                                <th>MAC ADD</th>
+                                <th>Abreviatura Área</th>
+                                <th>Número de VLAN</th>
+                                <th>IP ADD</th>
+                                <th>Nombre del Personal asignado</th>
+                                <th>Admin WR</th>
+                                <th>Password Router</th>
+                                <th>Nombre en el telefono</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Nombre del dispositivo</th>
+                                <th>MAC ADD</th>
+                                <th>Abreviatura Área</th>
+                                <th>Número de VLAN</th>
+                                <th>IP ADD</th>
+                                <th>Nombre del Personal asignado</th>
+                                <th>Admin WR</th>
+                                <th>Password Router</th>
+                                <th>Nombre en el telefono</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="FormModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="exampleModalLabel">Dispositivo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input id="txtid" type="hidden" value="0" />
+                <form id="formNivel">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="txtNombre">Nombre del dispositivo</label>
+                                <input type="text" class="form-control required" id="txtNombre" name="descripcion" autocomplete="off">
+                            </div>
+                            <div class="form-group">
+                                <label for="txtMac">MAC ADD</label>
+                                <input type="text" class="form-control required" id="txtMac" name="descripcion" autocomplete="off">
+                            </div>
+                            <div class="form-group">
+                                <label for="slArea">Area</label>
+                                <select id="slArea" class="form-control"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="slVlan">Vlan</label>
+                                <select id="slVlan" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="txtipadd">IP ADD</label>
+                                <input type="text" class="form-control required" id="txtipadd" name="descripcion" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="txtpersonal">Personal</label>
+                                <select type="text" class="form-control required" id="txtpersonal" name="descripcion" autocomplete="off"></select   >
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="txtadminwr">Admin Wireless Router:</label>
+                                <input type="text" class="form-control required" id="txtadminwr" name="descripcion" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="txtpasswordrouter">Password Router:</label>
+                                <input type="text" class="form-control required" id="txtpasswordrouter" name="descripcion" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="txtnombretelefono">Nombre a mostrar en el telefono:</label>
+                                <input type="text" class="form-control required" id="txtnombretelefono" name="descripcion" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="Guardar()">Guardar</button>
+            </div>
+        </div>
+        </div>
+        </div>
+@section scripts{
+
+<script>
+    $(document).ready(function () {
+             jQuery.ajax({
+                url: '@Url.Action("ListarArea", "Dispositivos")',
+                type: "GET",
+                data: null,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $.each(data.data, function (index, value) {
+                        $("<option>").attr({ "value": value.id_area }).text(value.abrev_area).appendTo("#slArea");
+                    });
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+             });
+
+            jQuery.ajax({
+                url: '@Url.Action("ListarVlan", "Dispositivos")',
+                type: "GET",
+                data: null,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $.each(data.data, function (index, value) {
+                        $("<option>").attr({ "value": value.id_vlan }).text(value.no_vlan).appendTo("#slVlan");
+                    });
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+
+            jQuery.ajax({
+                url: '@Url.Action("ListarPersonal", "Dispositivos")',
+                type: "GET",
+                data: null,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $.each(data.data, function (index, value) {
+                        $("<option>").attr({ "value": value.id_personal }).text(value.nombre).appendTo("#txtpersonal");
+                    });
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+        var tabladata;
+            tabladata = $('#tabla').DataTable({
+                responsive:true,
+                "ajax": {
+                    "url": '@Url.Action("ListarDispositivo", "Dispositivos")',
+                    "type": "GET",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": "nombre_dispositivo" },
+                    { "data": "mac_add" },
+                    {
+                        "data": "Area", render: function (data) {
+                            return data.abrev_area
+                        }
+                    },
+                    {
+                        "data": "Vlan", render: function (data) {
+                            return data.no_vlan
+                        }
+                    },
+                    { "data": "ipd_add" },
+                    {
+                        "data": "Personal", render: function (data) {
+                            return data.nombre
+                        }
+                    },
+                    {
+                        "data": "id_dispositivos", "render": function (data, type, row, meta) {
+
+                            return $("<button>").addClass("btn btn-primary btn-editar btn-sm").append(
+                                $("<i>").addClass("fas fa-pen")
+                            ).attr({ "data-informacion": JSON.stringify(row) })[0].outerHTML
+                            +
+                            $("<button>").addClass("btn btn-danger btn-eliminar btn-sm ml-2").append(
+                                $("<i>").addClass("fas fa-trash")
+                            ).attr({ "data-informacion": JSON.stringify(row) })[0].outerHTML;
+
+                        },
+                        "orderable": false,
+                        "searchable": false,
+                        "width": "90px"
+                    }
+
+                ],
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
+                }
+            });
+       });
+
+        $(document).on('click', '.btn-editar', function (event) {
+            var json = $(this).data("informacion")
+
+            abrirModal(json)
+        });
+
+        function abrirModal(json) {
+            $("#txtid").val(0);
+            $("#txtNombre").val("");
+            $("#txtMac").val("");
+            $("#slArea").val($("#slArea option:first").val());
+            $("#slVlan").val($("#slVlan option:first").val());
+            $("#txtipadd").val("");
+            $("#txtpersonal").val($("#txtpersonal option:first").val());
+            $("#txtadminwr").val("");
+            $("#txtpasswordrouter").val("");
+            $("#txtnombretelefono").val("");
+
+            if (json != null) {
+
+                $("#txtid").val(json.id_dispositivos);
+                $("#txtNombre").val(json.nombre_dispositivos);
+                $("#txtMac").val(json.mac_add);
+                $("#slArea").val(json.IArea.id_area)
+                $("#slVlan").val(json.IVlan.id_vlan)
+                $("#txtipadd").val(json.ip_add);
+                $("#txtpersonal").val(json.IPersonal.id_personal);
+                $("#txtadminwr").val(json.admin_wireless_router);
+                $("#txtpasswordrouter").val(json.passwordrouter);
+                $("#txtnombretelefono").val(json.nombre_en_telefono);
+            }
+
+            $('#FormModal').modal('show');
+        }
+
+        $(document).on('click', '.btn-eliminar', function (event) {
+            var json = $(this).data("informacion")
+
+            jQuery.ajax({
+                url: '@Url.Action("EliminarDispositivos", "Dispositivos")',
+                type: "POST",
+                data: JSON.stringify({ id: json.IdLibro}),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+
+                    if (data.resultado) {
+                        tabladata.ajax.reload();
+                    } else {
+                        alert("No se pudo eliminar")
+                    }
+                },
+                error: function (error) {
+                    console.log(error)
+                },
+                beforeSend: function () {
+
+                },
+            });
+        });
+
+       function Guardar() {
+
+           var object = {
+               nombre_dispositivos: $("#txtNombre").val(),
+               mac_add: $("#txtMac").val(),
+               IArea: { id_area: $("#slArea option:selected").val() },
+               IVlan: { id_vlan: $("#slVlan option:selected").val() },
+               ip_add: $("#txtipadd").val(),
+               IPersonal: { id_personal: $("#txtpersonal option:selected").val() },
+               admin_wireless_router: $("#txtadminwr").val(),
+               passwordrouter: $("#txtpasswordrouter").val(),
+               nombre_en_telefono: $("#txtnombretelefono").val()
+           }
+           var request = new FormData();
+           request.append("objeto", JSON.stringify(object));
+            jQuery.ajax({
+                url: '@Url.Action("GuardarDispositivos", "Dispositivos")',
+                type: "POST",
+                data: request,
+                processData: false,
+                contentType : false,
+                success: function (data) {
+
+                    if (data.resultado) {
+                        tabladata.ajax.reload();
+                        $('#FormModal').modal('hide');
+                    } else {
+                        alert("No se pudo guardar los cambios")
+                    }
+                },
+                error: function (error) {
+                    console.log(error)
+                },
+                beforeSend: function () {
+
+                },
+            });
+
+       }
+
+       $.fn.inputFilter = function (inputFilter) {
+           return this.on("input keydown keyup mousedown mouseup select contextmenu drop", function () {
+               if (inputFilter(this.value)) {
+                   this.oldValue = this.value;
+                   this.oldSelectionStart = this.selectionStart;
+                   this.oldSelectionEnd = this.selectionEnd;
+               } else if (this.hasOwnProperty("oldValue")) {
+                   this.value = this.oldValue;
+                   this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+               } else {
+                   this.value = "";
+               }
+           });
+       };
+
+       $("#txtejemplares").inputFilter(function (value) {
+           return /^-?\d*$/.test(value);
+       });
+
+</script>
+}
